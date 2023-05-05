@@ -33,10 +33,10 @@ public class MyChatGptService {
     public MyChatGptService(RestTemplate restTemplate, ChatgptService chatgptService) {
         this.restTemplate = restTemplate;
         this.chatgptService = chatgptService;
-    }public HttpEntity<ChatGptRequestDto> buildHttpEntity(ChatGptRequestDto requestDto){
+    }
+    public HttpEntity<ChatGptRequestDto> buildHttpEntity(ChatGptRequestDto requestDto){
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(ChatGptConfig.MEDIA_TYPE));
-//        headers.add(ChatGptConfig.AUTHORIZATION, ChatGptConfig.BEARER + ChatGptConfig.API_KEY);
         headers.add(ChatGptConfig.AUTHORIZATION, ChatGptConfig.BEARER + apiKey);
         return new HttpEntity<>(requestDto, headers);
     }
@@ -64,14 +64,12 @@ public class MyChatGptService {
         );
     }
 
-    public ChatGptResponseDto askSimmilarQuestion(QuestionRequestDto requestDto){
-        final String question = "비슷한 유형의 문제 만들고, 답변 출력해줘. 형식은 문제 : , 답 : 이런식으로 ";
-
+    public ChatGptResponseDto askWithPreQuestion(String preq, QuestionRequestDto requestDto){
         return this.getResponse(
                 this.buildHttpEntity(
                         new ChatGptRequestDto(
                                 ChatGptConfig.MODEL,
-                                question + requestDto.getQuestion(),
+                                preq + requestDto.getQuestion(),
                                 ChatGptConfig.MAX_TOKEN,
                                 ChatGptConfig.TEMPERATURE,
                                 ChatGptConfig.TOP_P
@@ -80,19 +78,5 @@ public class MyChatGptService {
         );
     }
 
-    public ChatGptResponseDto askAnswerInQuestion(QuestionRequestDto requestDto){
-        final String question = "아래 문제의 정답만 정확히 얘기해줘.";
 
-        return this.getResponse(
-                this.buildHttpEntity(
-                        new ChatGptRequestDto(
-                                ChatGptConfig.MODEL,
-                                question + "\n" +  requestDto.getQuestion(),
-                                ChatGptConfig.MAX_TOKEN,
-                                ChatGptConfig.TEMPERATURE,
-                                ChatGptConfig.TOP_P
-                        )
-                )
-        );
-    }
 }

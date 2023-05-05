@@ -30,7 +30,7 @@ public class AskGPTWithoutImage {
     }
 
     /*
-    주제 + 키워드로 문제를 생성해주는 API
+    문제 사진이 없는 경우, 주제 + 키워드로 문제를 생성해주는 API
     호출시마다 문제 바뀜
      */
     @ResponseBody
