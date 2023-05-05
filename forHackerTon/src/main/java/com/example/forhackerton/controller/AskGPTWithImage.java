@@ -100,6 +100,7 @@ public class AskGPTWithImage {
         try{
             String answer = clovaService.getClovaResponse(file);
             if(answer.isEmpty()){
+                logger.info("clova ERROR!");
                 return new BaseResponse<>(RegularResponseStatus.INTERNAL_SERVER_ERROR.getCode(), "ERROR", RegularResponseStatus.INTERNAL_SERVER_ERROR.getMessage());
             }
             ChatGptResponseDto responseDto = commonService.getCommonResponse(answer, preq);
@@ -124,6 +125,7 @@ public class AskGPTWithImage {
             Boolean flag = false;
             String question = clovaService.getClovaResponse(file);
             if(question.isEmpty()){
+                logger.info("clova ERROR!");
                 return new BaseResponse<>(RegularResponseStatus.INTERNAL_SERVER_ERROR.getCode(), "ERROR", RegularResponseStatus.INTERNAL_SERVER_ERROR.getMessage());
             }
             if(flag){

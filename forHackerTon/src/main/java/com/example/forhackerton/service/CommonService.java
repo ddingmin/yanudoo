@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CommonService {
 
-    private MyChatGptService chatGptService;
+    private final MyChatGptService chatGptService;
 
     @Autowired
     public CommonService(MyChatGptService chatGptService) {
@@ -23,9 +23,7 @@ public class CommonService {
         QuestionRequestDto requestDto = new QuestionRequestDto();
         requestDto.setQuestion(answer); //Clova 결과 데이터
         ChatGptResponseDto responseDto = chatGptService.askWithPreQuestion(preq, requestDto);
-
         return responseDto;
     }
-
 
 }
