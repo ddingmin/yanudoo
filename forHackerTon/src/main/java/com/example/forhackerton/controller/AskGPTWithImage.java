@@ -95,17 +95,22 @@ public class AskGPTWithImage {
     @ResponseBody
     @PostMapping("/justAnswer")
     public BaseResponse askWithImg(@RequestParam("file")MultipartFile file) throws IOException{
-        long startTime = System.currentTimeMillis();
+        logger.info("1");
         final String preq = "아래 문제의 정답만 정확히 얘기해줘.";
+        logger.info("2");
         try{
             String answer = clovaService.getClovaResponse(file);
+            logger.info("3");
             if(answer.isEmpty()){
                 logger.info("clova ERROR!");
                 return new BaseResponse<>(RegularResponseStatus.INTERNAL_SERVER_ERROR.getCode(), "ERROR", RegularResponseStatus.INTERNAL_SERVER_ERROR.getMessage());
             }
+            logger.info("4");
             ChatGptResponseDto responseDto = commonService.getCommonResponse(answer, preq);
+            logger.info("5");
 //          //정확도를 위해 2번 Request 진행
             ChatGptResponseDto correctResponseDto = commonService.getCommonResponse(responseDto.getChoices().toString(), preq);
+            logger.info("6");
             return new BaseResponse<>(RegularResponseStatus.OK.getCode(), correctResponseDto, RegularResponseStatus.OK.getMessage());
         }catch (Exception e){
             logger.info("image Processing Error! with checking Wright Answer");
