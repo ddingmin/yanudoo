@@ -64,14 +64,14 @@ public class MyChatGptService {
         );
     }
 
-    public ChatGptResponseDto askSTTQuestion(QuestionRequestDto requestDto){
-        final String question = "한글로 다음문장 번역해줘";
+    public ChatGptResponseDto askSimmilarQuestion(QuestionRequestDto requestDto){
+        final String question = "비슷한 유형의 문제 만들고, 답변 출력해줘. 형식은 문제 : , 답 : 이런식으로 ";
 
         return this.getResponse(
                 this.buildHttpEntity(
                         new ChatGptRequestDto(
                                 ChatGptConfig.MODEL,
-                                requestDto.getQuestion(),
+                                question + requestDto.getQuestion(),
                                 ChatGptConfig.MAX_TOKEN,
                                 ChatGptConfig.TEMPERATURE,
                                 ChatGptConfig.TOP_P

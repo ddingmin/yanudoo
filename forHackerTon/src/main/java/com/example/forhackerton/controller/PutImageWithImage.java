@@ -6,7 +6,9 @@ package com.example.forhackerton.controller;
 import com.example.forhackerton.common.BaseResponse;
 import com.example.forhackerton.config.RegularResponseStatus;
 import com.example.forhackerton.data.ChatGptResponseDto;
+import com.example.forhackerton.data.QuestionRequestDto;
 import com.example.forhackerton.service.ClovaService;
+import com.example.forhackerton.service.MyChatGptService;
 import com.example.forhackerton.service.SendToLambdaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,11 +33,17 @@ public class PutImageWithImage {
     private SendToLambdaService sendToLambdaService;
     private ClovaService clovaService;
 
+    private MyChatGptService chatGptService;
+
+    private final String preq = "비슷한 유형의 문제 만들고, 답변 출력해줘. 형식은 문제 : , 답 : 이런식으로 ";
+
     @Autowired
-    public PutImageWithImage(SendToLambdaService sendToLambdaService, ClovaService clovaService) {
+    public PutImageWithImage(SendToLambdaService sendToLambdaService, ClovaService clovaService, MyChatGptService chatGptService) {
         this.sendToLambdaService = sendToLambdaService;
         this.clovaService = clovaService;
+        this.chatGptService = chatGptService;
     }
+
 
     @ResponseBody
     @PostMapping("/askWithImage")
@@ -67,8 +75,16 @@ public class PutImageWithImage {
                 return new BaseResponse<>(RegularResponseStatus.INTERNAL_SERVER_ERROR.getCode(), "ERROR", RegularResponseStatus.INTERNAL_SERVER_ERROR.getMessage());
             }
             long endTime = System.currentTimeMillis();
+
+            QuestionRequestDto requestDto = new QuestionRequestDto();
+            logger.info("1");
+            requestDto.setQuestion(answer);
+            logger.info("2");
+            ChatGptResponseDto responseDto = chatGptService.askSimmilarQuestion(requestDto);
+            logger.info("3");
             logger.info("총시간 : " + (endTime - startTime)/ 1000 + "." +  (endTime - startTime)%1000 + "초");
-            return new BaseResponse<>(RegularResponseStatus.OK.getCode(), answer, RegularResponseStatus.OK.getMessage());
+            logger.info(responseDto.toString());
+            return new BaseResponse<>(RegularResponseStatus.OK.getCode(), responseDto, RegularResponseStatus.OK.getMessage());
         }catch (Exception e){
             logger.info("Image Processing ERROR!");
             e.printStackTrace();
