@@ -80,4 +80,19 @@ public class MyChatGptService {
         );
     }
 
+    public ChatGptResponseDto askAnswerInQuestion(QuestionRequestDto requestDto){
+        final String question = "아래 문제의 정답만 정확히 얘기해줘.";
+
+        return this.getResponse(
+                this.buildHttpEntity(
+                        new ChatGptRequestDto(
+                                ChatGptConfig.MODEL,
+                                question + "\n" +  requestDto.getQuestion(),
+                                ChatGptConfig.MAX_TOKEN,
+                                ChatGptConfig.TEMPERATURE,
+                                ChatGptConfig.TOP_P
+                        )
+                )
+        );
+    }
 }
