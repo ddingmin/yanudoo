@@ -24,4 +24,6 @@ public class Choice implements Serializable {
         this.index = index;
         this.finishReason = finishReason;
     }
+
+    //List<Choice> choices;
 }

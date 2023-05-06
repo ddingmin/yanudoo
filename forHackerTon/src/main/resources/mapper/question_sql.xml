@@ -18,4 +18,20 @@
         order by created_at
                 desc limit 10
     </select>
+
+    <insert id="QtoQSave" parameterType="com.example.forhackerton.data.QtoQSaveDto">
+        insert into question_to_question(original_question, original_answer,
+                                         generated_question, generated_answer)
+        values(#{originalQuestion}, #{originalAnswer},
+                #{generatedQuestion}, #{generatedAnswer})
+
+    </insert>
+
+    <insert id="KtoQSave" parameterType="com.example.forhackerton.data.KtoQSaveDto">
+        insert into keyword_to_question(keyword, search_count,
+                                        generated_question, generated_answer)
+        values(#{keyword}, #{searchCount},
+               #{generatedQuestion}, #{generatedAnswer})
+    </insert>
+
 </mapper>

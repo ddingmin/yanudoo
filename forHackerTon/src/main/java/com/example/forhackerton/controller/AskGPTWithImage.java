@@ -6,11 +6,11 @@ package com.example.forhackerton.controller;
 import com.example.forhackerton.common.BaseResponse;
 import com.example.forhackerton.config.RegularResponseStatus;
 import com.example.forhackerton.data.ChatGptResponseDto;
+import com.example.forhackerton.data.QtoQSaveDto;
 import com.example.forhackerton.data.QuestionRequestDto;
-import com.example.forhackerton.service.ClovaService;
-import com.example.forhackerton.service.CommonService;
-import com.example.forhackerton.service.MyChatGptService;
-import com.example.forhackerton.service.SendToLambdaService;
+import com.example.forhackerton.service.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,14 +32,19 @@ public class AskGPTWithImage {
 
     private CommonService commonService;
 
+    private SqlService sqlService;
+
     public String beforeQuestion = "";
 
     @Autowired
-    public AskGPTWithImage(SendToLambdaService sendToLambdaService, ClovaService clovaService, MyChatGptService chatGptService, CommonService commonService) {
+    public AskGPTWithImage(SendToLambdaService sendToLambdaService, ClovaService clovaService,
+                           MyChatGptService chatGptService, CommonService commonService,
+                           SqlService sqlService) {
         this.sendToLambdaService = sendToLambdaService;
         this.clovaService = clovaService;
         this.chatGptService = chatGptService;
         this.commonService = commonService;
+        this.sqlService = sqlService;
     }
 
     /*
@@ -77,11 +82,37 @@ public class AskGPTWithImage {
             System.out.println("Available memory (MB): " + (Runtime.getRuntime().freeMemory() / (1024 * 1024)) + " MB");
             if(answer.isEmpty()){
                 return new BaseResponse<>(RegularResponseStatus.INTERNAL_SERVER_ERROR.getCode(), "ERROR", RegularResponseStatus.INTERNAL_SERVER_ERROR.getMessage());
-
             }
             ChatGptResponseDto responseDto = commonService.getCommonResponse(answer, preq);
             System.out.println("Available memory (MB): " + (Runtime.getRuntime().freeMemory() / (1024 * 1024)) + " MB");
             long endTime = System.currentTimeMillis();
+
+            QtoQSaveDto saveDto = new QtoQSaveDto();
+            String result1 = responseDto.getChoices().get(0).getText().replaceAll("(?<=한글)(?!$)", " ");
+
+            //original question 저장하기 위해선 -> Json 데이터 파싱한뒤 뽑아내야됨
+            String jsonString = answer;
+
+            JSONObject jsonObject = new JSONObject(jsonString);
+            JSONArray images = jsonObject.getJSONArray("images");
+            JSONObject firstImage = images.getJSONObject(0);
+            JSONArray fields = firstImage.getJSONArray("fields");
+            StringBuilder k = new StringBuilder();
+            for (int i = 0; i < fields.length(); i++) {
+                JSONObject field = fields.getJSONObject(i);
+                String inferText = field.getString("inferText");
+                k.append(inferText);
+            }
+            saveDto.setOriginalQuestion(k.toString().replaceAll("(?<=한글)(?!$)", " "));
+            saveDto.setOriginalAnswer(result1); //값 잘 들어가는지 찍어보기
+            saveDto.setGeneratedQuestion(result1);
+            String result = responseDto.getChoices().get(0).getText().replaceAll("(?<=한글)(?!$)", " ");
+            saveDto.setGeneratedAnswer(result);
+
+            logger.info(result);
+            sqlService.QtoQSave(saveDto);
+
+            logger.info("qto question has saved");
             logger.info("총시간 : " + (endTime - startTime)/ 1000 + "." +  (endTime - startTime)%1000 + "초");
             System.out.println("Available memory (MB): " + (Runtime.getRuntime().freeMemory() / (1024 * 1024)) + " MB");
             return new BaseResponse<>(RegularResponseStatus.OK.getCode(), responseDto, RegularResponseStatus.OK.getMessage());
