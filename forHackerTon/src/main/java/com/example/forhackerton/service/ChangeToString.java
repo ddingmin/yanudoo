@@ -1,10 +1,14 @@
 package com.example.forhackerton.service;
 
+import com.fasterxml.jackson.databind.deser.DataFormatReaders;
 import com.google.gson.JsonObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class ChangeToString {
@@ -24,5 +28,19 @@ public class ChangeToString {
             t.append(inferText);
         }
         return t.toString();
+    }
+
+    public String makeBlank(String k){
+        String koreanRegex = "[가-힣]+";
+        Pattern pattern = Pattern.compile(koreanRegex);
+        Matcher matcher = pattern.matcher(k);
+
+        StringBuffer sb = new StringBuffer();
+        while(matcher.find()){
+            matcher.appendReplacement(sb, matcher.group() + " ");
+        }
+        matcher.appendTail(sb);
+
+        return sb.toString();
     }
 }

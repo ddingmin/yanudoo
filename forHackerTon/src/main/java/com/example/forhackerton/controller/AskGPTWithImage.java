@@ -93,25 +93,10 @@ public class AskGPTWithImage {
             long endTime = System.currentTimeMillis();
 
             QtoQSaveDto saveDto = new QtoQSaveDto();
-            String result1 = responseDto.getChoices().get(0).getText().replaceAll("(?<=한글)(?!$)", " ");
-
-            //original question 저장하기 위해선 -> Json 데이터 파싱한뒤 뽑아내야됨
-            String jsonString = answer;
-
-            JSONObject jsonObject = new JSONObject(jsonString);
-            JSONArray images = jsonObject.getJSONArray("images");
-            JSONObject firstImage = images.getJSONObject(0);
-            JSONArray fields = firstImage.getJSONArray("fields");
-            StringBuilder k = new StringBuilder();
-            for (int i = 0; i < fields.length(); i++) {
-                JSONObject field = fields.getJSONObject(i);
-                String inferText = field.getString("inferText");
-                k.append(inferText);
-            }
-            saveDto.setOriginalQuestion(k.toString().replaceAll("(?<=한글)(?!$)", " "));
-            saveDto.setOriginalAnswer(result1); //값 잘 들어가는지 찍어보기
-            saveDto.setGeneratedQuestion(result1);
-            String result = responseDto.getChoices().get(0).getText().replaceAll("(?<=한글)(?!$)", " ");
+            String result = responseDto.getChoices().get(0).getText();
+            saveDto.setOriginalQuestion(changeToString.makeBlank(changeToString.clovaToString(answer)));
+            saveDto.setOriginalAnswer(result); //값 잘 들어가는지 찍어보기
+            saveDto.setGeneratedQuestion(changeToString.makeBlank(changeToString.clovaToString(answer)));
             saveDto.setGeneratedAnswer(result);
 
             logger.info(result);
@@ -164,6 +149,7 @@ public class AskGPTWithImage {
     여러번 호출시 -> 서로 다른 문제 / 답 호출 가능
     DB저장 O, Concept -> 문제 -> 답안 호출.
     QuestionToQuestion 방식
+    이건 makeBlank 없이도 값 잘 들어감.
      */
     @ResponseBody
     @PostMapping("/withConcept")
