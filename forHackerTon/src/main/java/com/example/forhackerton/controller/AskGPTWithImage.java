@@ -137,7 +137,7 @@ public class AskGPTWithImage {
 //          //정확도를 위해 2번 Request 진행
             ChatGptResponseDto correctResponseDto = commonService.getCommonResponse(responseDto.getChoices().toString(), preq);
             System.out.println("Available memory (MB): " + (Runtime.getRuntime().freeMemory() / (1024 * 1024)) + " MB");
-            return new BaseResponse<>(RegularResponseStatus.OK.getCode(), correctResponseDto, RegularResponseStatus.OK.getMessage());
+            return new BaseResponse<>(RegularResponseStatus.OK.getCode(), correctResponseDto.getChoices().get(0).getText(), RegularResponseStatus.OK.getMessage());
         }catch (Exception e){
             logger.info("image Processing Error! with checking Wright Answer");
             e.printStackTrace();
@@ -177,7 +177,7 @@ public class AskGPTWithImage {
                 saveDto.setGeneratedAnswer(responseDto.getChoices().get(0).getText());
                 sqlService.QtoQSave(saveDto);
 
-                return new BaseResponse<>(RegularResponseStatus.OK.getCode(), responseDto, RegularResponseStatus.OK.getMessage());
+                return new BaseResponse<>(RegularResponseStatus.OK.getCode(), responseDto.getChoices().get(0).getText(), RegularResponseStatus.OK.getMessage());
             }else{
                 //처음 물어본 경우, before Question / answer가 없기 때문에, 도출된 결과 바로 DB 저장
                 ChatGptResponseDto responseDto = commonService.getCommonResponse(question, preq);
@@ -189,7 +189,7 @@ public class AskGPTWithImage {
                 saveDto.setGeneratedQuestion(changeToString.clovaToString(question));
                 saveDto.setGeneratedAnswer(tmpAnswer);
                 sqlService.QtoQSave(saveDto);
-                return new BaseResponse<>(RegularResponseStatus.OK.getCode(), responseDto, RegularResponseStatus.OK.getMessage());
+                return new BaseResponse<>(RegularResponseStatus.OK.getCode(), responseDto.getChoices().get(0).getText(), RegularResponseStatus.OK.getMessage());
             }
 
         }catch (Exception e){
