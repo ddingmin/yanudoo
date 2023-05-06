@@ -65,11 +65,13 @@ public class AskGPTWithoutImage {
                 t++;
                 saveDto.setGeneratedQuestion(changeToString.makeBlank(k));
                 sqlService.KtoQSave(saveDto);
-                return new BaseResponse<>(RegularResponseStatus.OK.getCode(), responseDto, RegularResponseStatus.OK.getMessage());
+                String z = responseDto.getChoices().get(0).getText();
+                return new BaseResponse<>(RegularResponseStatus.OK.getCode(), z, RegularResponseStatus.OK.getMessage());
             }else{
                 ChatGptResponseDto responseDto = withoutImgService.getWithPreQuestion(askWithoutImgDto, preQuestion);
                 preQuestion = responseDto.getChoices().toString();
-                return new BaseResponse<>(RegularResponseStatus.OK.getCode(), responseDto, RegularResponseStatus.OK.getMessage());
+                String z = responseDto.getChoices().get(0).getText();
+                return new BaseResponse<>(RegularResponseStatus.OK.getCode(), z, RegularResponseStatus.OK.getMessage());
             }
 
         }catch (Exception e){
