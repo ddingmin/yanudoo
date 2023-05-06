@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.example.forhackerton.repository.Dao">
+
+    <select id="getQTopList" resultType="com.example.forhackerton.data.QtoQListDto">
+        select generated_question, generated_answer
+        from question_to_question
+        order by created_at
+        desc limit 10
+    </select>
+
+    <select id="getKTopList" resultType="com.example.forhackerton.data.KtoQListDto">
+        select generated_question, generated_answer
+        from keyword_to_question
+        order by created_at
+                desc limit 10
+    </select>
+</mapper>

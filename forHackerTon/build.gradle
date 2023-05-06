@@ -44,7 +44,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     compileOnly 'com.google.cloud:google-cloud-speech:2.2.0'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'mysql:mysql-connector-java'
 //    runtimeOnly 'com.mysql:mysql-connector-j'
     implementation "ws.schild:jave-core:3.3.1"
     runtimeOnly 'mysql:mysql-connector-java'
@@ -58,7 +58,10 @@ dependencies {
     implementation 'io.github.flashvayne:chatgpt-spring-boot-starter:1.0.0'
 //    implementation group: 'ws.schild', name: 'jave-all-deps', version: '3.3.1'
 //    implementation 'com.openai:openai-java:0.7.0'
-
+    implementation group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter', version: '2.1.2'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.springframework.session:spring-session-jdbc'
+    runtimeOnly 'mysql:mysql-connector-java'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'com.google.cloud:google-cloud-speech:2.2.0'
     implementation 'com.google.auth:google-auth-library-oauth2-http:1.16.0'
