@@ -93,11 +93,11 @@ public class AskGPTWithImage {
             long endTime = System.currentTimeMillis();
 
             QtoQSaveDto saveDto = new QtoQSaveDto();
-            String result = responseDto.getChoices().get(0).getText();
-            saveDto.setOriginalQuestion(changeToString.makeBlank(changeToString.clovaToString(answer)));
-            saveDto.setOriginalAnswer(result); //값 잘 들어가는지 찍어보기
-            saveDto.setGeneratedQuestion(changeToString.makeBlank(changeToString.clovaToString(answer)));
-            saveDto.setGeneratedAnswer(result);
+            String result = responseDto.getChoices().get(0).getText().replaceFirst("^\\n\\n", "");
+            saveDto.setOriginalQuestion(changeToString.makeBlank(changeToString.clovaToString(answer)).replaceFirst("^\\n\\n", ""));
+            saveDto.setOriginalAnswer(result.replaceFirst("^\\n\\n", "")); //값 잘 들어가는지 찍어보기
+            saveDto.setGeneratedQuestion(changeToString.makeBlank(changeToString.clovaToString(answer)).replaceFirst("^\\n\\n", ""));
+            saveDto.setGeneratedAnswer(result.replaceFirst("^\\n\\n", ""));
 
             logger.info(result);
             sqlService.QtoQSave(saveDto);
@@ -130,14 +130,13 @@ public class AskGPTWithImage {
             System.out.println("Available memory (MB): " + (Runtime.getRuntime().freeMemory() / (1024 * 1024)) + " MB");
             if(answer.isEmpty()){
                 logger.info("clova ERROR!");
-
                 return new BaseResponse<>(RegularResponseStatus.INTERNAL_SERVER_ERROR.getCode(), "ERROR", RegularResponseStatus.INTERNAL_SERVER_ERROR.getMessage());
             }
             ChatGptResponseDto responseDto = commonService.getCommonResponse(answer, preq);
 //          //정확도를 위해 2번 Request 진행
             ChatGptResponseDto correctResponseDto = commonService.getCommonResponse(responseDto.getChoices().toString(), preq);
             System.out.println("Available memory (MB): " + (Runtime.getRuntime().freeMemory() / (1024 * 1024)) + " MB");
-            return new BaseResponse<>(RegularResponseStatus.OK.getCode(), correctResponseDto.getChoices().get(0).getText(), RegularResponseStatus.OK.getMessage());
+            return new BaseResponse<>(RegularResponseStatus.OK.getCode(), correctResponseDto.getChoices().get(0).getText().replaceFirst("^\\n\\n", ""), RegularResponseStatus.OK.getMessage());
         }catch (Exception e){
             logger.info("image Processing Error! with checking Wright Answer");
             e.printStackTrace();
@@ -177,7 +176,7 @@ public class AskGPTWithImage {
                 saveDto.setGeneratedAnswer(responseDto.getChoices().get(0).getText());
                 sqlService.QtoQSave(saveDto);
 
-                return new BaseResponse<>(RegularResponseStatus.OK.getCode(), responseDto.getChoices().get(0).getText(), RegularResponseStatus.OK.getMessage());
+                return new BaseResponse<>(RegularResponseStatus.OK.getCode(), responseDto.getChoices().get(0).getText().replaceFirst("^\\n\\n", ""), RegularResponseStatus.OK.getMessage());
             }else{
                 //처음 물어본 경우, before Question / answer가 없기 때문에, 도출된 결과 바로 DB 저장
                 ChatGptResponseDto responseDto = commonService.getCommonResponse(question, preq);
@@ -189,7 +188,7 @@ public class AskGPTWithImage {
                 saveDto.setGeneratedQuestion(changeToString.clovaToString(question));
                 saveDto.setGeneratedAnswer(tmpAnswer);
                 sqlService.QtoQSave(saveDto);
-                return new BaseResponse<>(RegularResponseStatus.OK.getCode(), responseDto.getChoices().get(0).getText(), RegularResponseStatus.OK.getMessage());
+                return new BaseResponse<>(RegularResponseStatus.OK.getCode(), responseDto.getChoices().get(0).getText().replaceFirst("^\\n\\n", ""), RegularResponseStatus.OK.getMessage());
             }
 
         }catch (Exception e){

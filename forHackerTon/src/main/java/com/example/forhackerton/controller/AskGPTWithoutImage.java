@@ -46,7 +46,7 @@ public class AskGPTWithoutImage {
 
     /*
         문제 사진이 없는 경우, 주제 + 키워드로 문제를 생성해주는 API
-        호출시마다 문제 바뀜
+        호출시마다 문제 바뀜, 저장코드 작성!!!!
          */
     @ResponseBody
     @PostMapping("/noImg")
@@ -59,7 +59,7 @@ public class AskGPTWithoutImage {
                 ChatGptResponseDto responseDto = withoutImgService.getQuestion(askWithoutImgDto, flag);
                 KtoQSaveDto saveDto = new KtoQSaveDto();
                 saveDto.setKeyword(askWithoutImgDto.getKeyWord());
-                String k = responseDto.getChoices().get(0).getText();
+                String k = responseDto.getChoices().get(0).getText().replaceFirst("^\\n\\n", "");
                 saveDto.setGeneratedAnswer(changeToString.makeBlank(k));
                 saveDto.setSearchCount(t);
                 t++;
