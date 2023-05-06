@@ -81,7 +81,7 @@ public class AskGPTWithImage {
     @PostMapping("/detect")
     public BaseResponse askColvaImage(@RequestParam("file")MultipartFile file) throws IOException{
         long startTime = System.currentTimeMillis();
-        final String preq = "비슷한 유형의 문제 만들고, 답변 출력해줘. 형식은 문제 : , 답 : 이런식으로 ";
+        final String preq = "비슷한 문제 아주 새롭게 만들고, 답변 출력해줘. 형식은 문제 : , 답 : 이런식으로 ";
         try{
             String answer = clovaService.getClovaResponse(file);
             System.out.println("Available memory (MB): " + (Runtime.getRuntime().freeMemory() / (1024 * 1024)) + " MB");
