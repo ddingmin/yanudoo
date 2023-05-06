@@ -10,6 +10,7 @@ import com.theokanning.openai.completion.chat.ChatMessageRole;
 import com.theokanning.openai.service.OpenAiService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,7 @@ public class InterviewController {
     @org.springframework.beans.factory.annotation.Value("${openai.api-key}")
     private String token;
 
+    private final List<ChatMessage> messages = new ArrayList<>();
     Logger logger = LoggerFactory.getLogger(InterviewController.class);
 
     @ResponseBody
@@ -31,10 +33,8 @@ public class InterviewController {
     public BaseResponse chatWithMe(@RequestBody QuestionRequestDto requestDto){
 
         OpenAiService service = new OpenAiService(token);
-        List<ChatMessage> messages = new ArrayList<>();
         ChatMessage systemMessage = new ChatMessage(
                 ChatMessageRole.SYSTEM.value(), "면접봇");
-
         String k = requestDto.getQuestion();
         messages.add(new ChatMessage(ChatMessageRole.USER.value(), k));
 
