@@ -164,7 +164,7 @@ public class AskGPTWithImage {
 
             if(flag){
                 //다른 문제를 받아오고 싶을 때
-                String condition = beforeQuestion + "과 다른 문제와 답 출력해줘";
+                String condition = beforeQuestion + "과 다른 문제를 만들고, 문제의 답 출력해줘";
                 beforeQuestion +=  " ," +  condition;
                 ChatGptResponseDto responseDto = commonService.getCommonResponse( condition + question, preq);
                 QtoQSaveDto saveDto = new QtoQSaveDto();

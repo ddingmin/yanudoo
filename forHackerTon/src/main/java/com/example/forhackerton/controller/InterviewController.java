@@ -41,7 +41,7 @@ public class InterviewController {
                 systemMessage = new ChatMessage(
                         ChatMessageRole.SYSTEM.value(), "너는 사용자와 대화하는 동안 면접관 역할을 한다. 사용자는 이 회사에 입사하고 싶어하는 상황이고, 사용자의 대화를 바탕으로 면접을 진행하면 된다.\n" +
                         "기존에 했던 질문과 유사한 질문들은 하지 않고, 사용자의 대답을 바탕으로 관련된 새로운 질문들을 하는 방식으로 면접을 진행하며, " +
-                        "한번에 한가지 질문만 한다." + "너는 " + requestDto.getTmp() + "의 성격으로 대답해주면 돼.");
+                        "한번에 한가지 질문만 한다." + "너는 " + requestDto.getTmp() + "의 성격으로 질문해주면 돼.");
                 flag = true;
                 messages.add(systemMessage);
                 t++;
