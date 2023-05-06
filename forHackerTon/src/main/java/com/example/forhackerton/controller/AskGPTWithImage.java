@@ -34,17 +34,22 @@ public class AskGPTWithImage {
 
     private SqlService sqlService;
 
+    private ChangeToString changeToString;
+
     public String beforeQuestion = "";
+
+    public String beforeAnswer = "";
 
     @Autowired
     public AskGPTWithImage(SendToLambdaService sendToLambdaService, ClovaService clovaService,
                            MyChatGptService chatGptService, CommonService commonService,
-                           SqlService sqlService) {
+                           SqlService sqlService, ChangeToString changeToString) {
         this.sendToLambdaService = sendToLambdaService;
         this.clovaService = clovaService;
         this.chatGptService = chatGptService;
         this.commonService = commonService;
         this.sqlService = sqlService;
+        this.changeToString = changeToString;
     }
 
     /*
@@ -126,6 +131,7 @@ public class AskGPTWithImage {
     /*
     문제 정답 출력 API
     ChatGPT를 두번 호출해, 문제 배열을 정렬시키고 해당하는 정답 출력함.
+    DB저장 안함.
      */
     @ResponseBody
     @PostMapping("/justAnswer")
@@ -156,6 +162,8 @@ public class AskGPTWithImage {
 
     /*
     여러번 호출시 -> 서로 다른 문제 / 답 호출 가능
+    DB저장 O, Concept -> 문제 -> 답안 호출.
+    QuestionToQuestion 방식
      */
     @ResponseBody
     @PostMapping("/withConcept")
@@ -168,15 +176,33 @@ public class AskGPTWithImage {
                 logger.info("clova ERROR!");
                 return new BaseResponse<>(RegularResponseStatus.INTERNAL_SERVER_ERROR.getCode(), "ERROR", RegularResponseStatus.INTERNAL_SERVER_ERROR.getMessage());
             }
+
             if(flag){
                 //다른 문제를 받아오고 싶을 때
-                String condition = beforeQuestion + "과 다른 문제 출력해줘";
+                String condition = beforeQuestion + "과 다른 문제와 답 출력해줘";
+                beforeQuestion +=  " ," +  condition;
                 ChatGptResponseDto responseDto = commonService.getCommonResponse( condition + question, preq);
+                QtoQSaveDto saveDto = new QtoQSaveDto();
+                String tmpRes = responseDto.getChoices().get(0).getText();
+                beforeAnswer = tmpRes;
+                saveDto.setOriginalQuestion(changeToString.clovaToString(condition));
+                saveDto.setOriginalAnswer(beforeQuestion);
+                saveDto.setGeneratedQuestion(responseDto.getChoices().get(0).getText());
+                saveDto.setGeneratedAnswer(responseDto.getChoices().get(0).getText());
+                sqlService.QtoQSave(saveDto);
+
                 return new BaseResponse<>(RegularResponseStatus.OK.getCode(), responseDto, RegularResponseStatus.OK.getMessage());
             }else{
+                //처음 물어본 경우, before Question / answer가 없기 때문에, 도출된 결과 바로 DB 저장
                 ChatGptResponseDto responseDto = commonService.getCommonResponse(question, preq);
-                beforeQuestion = responseDto.getChoices().toString();
+                String tmpAnswer = responseDto.getChoices().get(0).getText();
                 flag = true;
+                QtoQSaveDto saveDto = new QtoQSaveDto();
+                saveDto.setOriginalQuestion(changeToString.clovaToString(question));
+                saveDto.setOriginalAnswer(tmpAnswer); //값 잘 들어가는지 찍어보기
+                saveDto.setGeneratedQuestion(changeToString.clovaToString(question));
+                saveDto.setGeneratedAnswer(tmpAnswer);
+                sqlService.QtoQSave(saveDto);
                 return new BaseResponse<>(RegularResponseStatus.OK.getCode(), responseDto, RegularResponseStatus.OK.getMessage());
             }
 
