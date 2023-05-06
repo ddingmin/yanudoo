@@ -74,12 +74,16 @@ public class AskGPTWithImage {
         final String preq = "비슷한 유형의 문제 만들고, 답변 출력해줘. 형식은 문제 : , 답 : 이런식으로 ";
         try{
             String answer = clovaService.getClovaResponse(file);
+            System.out.println("Available memory (MB): " + (Runtime.getRuntime().freeMemory() / (1024 * 1024)) + " MB");
             if(answer.isEmpty()){
                 return new BaseResponse<>(RegularResponseStatus.INTERNAL_SERVER_ERROR.getCode(), "ERROR", RegularResponseStatus.INTERNAL_SERVER_ERROR.getMessage());
+
             }
             ChatGptResponseDto responseDto = commonService.getCommonResponse(answer, preq);
+            System.out.println("Available memory (MB): " + (Runtime.getRuntime().freeMemory() / (1024 * 1024)) + " MB");
             long endTime = System.currentTimeMillis();
             logger.info("총시간 : " + (endTime - startTime)/ 1000 + "." +  (endTime - startTime)%1000 + "초");
+            System.out.println("Available memory (MB): " + (Runtime.getRuntime().freeMemory() / (1024 * 1024)) + " MB");
             return new BaseResponse<>(RegularResponseStatus.OK.getCode(), responseDto, RegularResponseStatus.OK.getMessage());
         }catch (Exception e){
             logger.info("Image Processing ERROR!");
@@ -95,28 +99,22 @@ public class AskGPTWithImage {
     @ResponseBody
     @PostMapping("/justAnswer")
     public BaseResponse askWithImg(@RequestParam("file")MultipartFile file) throws IOException{
-        logger.info("1");
-        System.out.println("1");
+        System.out.println("Available memory (MB): " + (Runtime.getRuntime().freeMemory() / (1024 * 1024)) + " MB");
         final String preq = "아래 문제의 정답만 정확히 얘기해줘.";
         logger.info("2");
         System.out.println("2");
         try{
             String answer = clovaService.getClovaResponse(file);
-            logger.info("3");
-            System.out.println("3");
+            System.out.println("Available memory (MB): " + (Runtime.getRuntime().freeMemory() / (1024 * 1024)) + " MB");
             if(answer.isEmpty()){
                 logger.info("clova ERROR!");
+
                 return new BaseResponse<>(RegularResponseStatus.INTERNAL_SERVER_ERROR.getCode(), "ERROR", RegularResponseStatus.INTERNAL_SERVER_ERROR.getMessage());
             }
-            logger.info("4");
-            System.out.println("4");
             ChatGptResponseDto responseDto = commonService.getCommonResponse(answer, preq);
-            logger.info("5");
-            System.out.println("5");
 //          //정확도를 위해 2번 Request 진행
             ChatGptResponseDto correctResponseDto = commonService.getCommonResponse(responseDto.getChoices().toString(), preq);
-            logger.info("6");
-            System.out.println("6");
+            System.out.println("Available memory (MB): " + (Runtime.getRuntime().freeMemory() / (1024 * 1024)) + " MB");
             return new BaseResponse<>(RegularResponseStatus.OK.getCode(), correctResponseDto, RegularResponseStatus.OK.getMessage());
         }catch (Exception e){
             logger.info("image Processing Error! with checking Wright Answer");
